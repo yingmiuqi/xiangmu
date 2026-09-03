@@ -1,0 +1,37 @@
+# ===== 虚拟环境 / 缓存 =====
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# ===== IDE / 工具 =====
+.idea/
+.vscode/
+.claude/
+*.iml
+
+# ===== 日志与临时文件 =====
+*.log
+*.err.log
+*.stdout.log
+*.stderr.log
+*.err
+/tmp_image_stats.csv
+/qq_ocr_dump.txt
+/webui_batch.txt
+
+# ===== 开发临时脚本 =====
+/_*.py
+
+# ===== 模型训练产物（可用 train_model.py 重新生成） =====
+/models/watermark_model.pth
+/models/*_pos.txt
+/models/*_neg.txt
+/models/train_pos_dirs.txt
+/models/train_checkpoint.json
+/models/scan_scores*.jsonl
+/models/probe_spawned.*
+/models/qq_pos/

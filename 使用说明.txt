@@ -1,0 +1,53 @@
+图片清洗项目自助使用说明
+================================
+
+【代码位置】
+  项目目录：D:\图片清理\pythonProject1
+  运行环境：D:\图片清理\pythonProject1\.venv\Scripts\python.exe
+           （请始终用这个 python，不要用系统 python）
+
+【一、自己训练水印模型】
+  准备两个文件夹：
+    A. 坏图文件夹：你确认“需要移动/删除”的图片（比如人工 ERR）
+    B. 正常图文件夹：你确认“正常保留”的图片（比如干净产品图）
+  运行（在项目目录下，把路径换成你自己的）：
+    .venv\Scripts\python.exe train_model.py ^
+        --pos-dir "E:\你的坏图文件夹" --neg-dir "E:\你的正常图文件夹" --epochs 5
+  训练完成后模型自动保存到 models\watermark_model.pth，清洗时自动使用。
+
+【二、清洗一个批次】
+  方式一（推荐，避免中文路径问题）：
+    1) 用记事本打开 batch_paths.py，把 BATCH_ACTIVE 改成你要清洗的批次目录；
+    2) 运行：.venv\Scripts\python.exe -X utf8 -m image_cleaner.runner --input 由配置读取 --move
+       （runner 会自动读取 BATCH_ACTIVE；加 --move 才会真正移动）
+  方式二（直接传路径）：
+    .venv\Scripts\python.exe -X utf8 -m image_cleaner.runner --input "E:\批次目录" --move
+    注意：如果路径含中文且命令行出现乱码，请改用方式一。
+  结果：
+    - 不合格图片移动到 批次目录\自动清扫ERR
+    - 报告在 批次目录\clean_report\report.csv
+
+【三、参照库（相似图 >=95% 即移动）】
+  把某些“记住的图”加入参照库：
+    .venv\Scripts\python.exe build_ref_lib.py --folder "E:\要记住的图片文件夹"
+    .venv\Scripts\python.exe build_ref_lib.py --list "E:\文件列表.txt"
+
+【四、常用开关】
+  --no-ocr     跳过文字识别（更快，但漏掉文字类规则）
+  --no-wm      跳过水印模型打分
+  --no-dedup   关闭去重
+  --limit N    只处理前 N 张（测试用）
+  --force      忽略断点重跑全部
+
+【五、注意事项】
+  1. 训练数据质量决定模型质量：坏图文件夹里的图一定要“确实是坏的”。
+  2. 训练耗时：1 万张左右约 1~2 小时（CPU）。
+  3. 清洗耗时：约 1 秒/张（OCR 为主），几万张需数小时；可配合断点续跑。
+  4. 参照库收录原则：只收录“按口径不移动、但你想记住”的图；
+     模型漏识别的图形水印要靠训练解决，不要塞进参照库。
+
+【六、网页界面（可选，更省事）】
+  启动：.venv\Scripts\python.exe -X utf8 webui\app.py
+  然后浏览器打开：http://127.0.0.1:5000
+  功能：设置批次 / 一键启动（分析或移动）/ 暂停 / 打开ERR和报告 / 实时进度和日志。
+  注意：网页服务是独立后台进程，电脑重启后需要重新启动。
